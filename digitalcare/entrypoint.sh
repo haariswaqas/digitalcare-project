@@ -18,5 +18,6 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 # Start Gunicorn
-echo "Starting Gunicorn..."
-exec gunicorn digitalcare.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 4
+echo "Starting Uvicorn..."
+exec gunicorn -k uvicorn.workers.UvicornWorker digitalcare.asgi:application --bind 0.0.0.0:${PORT:-8000} --workers 4
+
