@@ -292,7 +292,7 @@ CORS_ALLOW_HEADERS = [
 # Email configuration example:
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # Use Django console backend to simulate email sending
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
