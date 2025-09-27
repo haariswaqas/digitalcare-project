@@ -3,7 +3,7 @@ from .AuthUrls import urlpatterns as AuthUrls
 from .PasswordResetUrls import urlpatterns as PasswordResetUrls
 from .FacilityUrls import urlpatterns as FacilityUrls
 from .AppointmentUrls import urlpatterns as AppointmentUrls
-from .ChatUrls import websocket_urlpatterns as ChatUrls
+from .ChatUrls import urlpatterns as ChatUrls
 from .ConsultationUrls import urlpatterns as ConsultationUrls
 from .VideoConsultationUrls import urlpatterns as VideoConsultationUrls
 from .PrescriptionUrls import urlpatterns as PrescriptionUrls
