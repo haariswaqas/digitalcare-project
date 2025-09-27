@@ -57,6 +57,8 @@ INSTALLED_APPS = [
   
     'rest_framework', 
 
+    'channels',
+    'channels_redis',
     
     'rest_framework_simplejwt.token_blacklist',
     
@@ -97,7 +99,29 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'digitalcare.wsgi.application'
+# ASGI Configuration
+ASGI_APPLICATION = 'digitalcare.routing.application' 
 
+# Channel Layers configuration with Redis Cloud
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [
+                {
+                    'address': os.environ.get('REDIS_URL', 'redis://localhost:6379'),
+                    'ssl_cert_reqs': None,
+                }
+            ],
+            'capacity': 1500,
+            'expiry': 10,
+        },
+    },
+}
+
+# Maximum file upload size (5MB)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
