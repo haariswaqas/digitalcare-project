@@ -4,6 +4,7 @@ from .ProfileViews import BaseProfileView, StudentProfileView, VisitorProfileVie
 from .HealthCardViews import *
 from .FacilityViews import *
 from .AppointmentViews import *
+from .ChatViews import *
 from .ConsultationViews import *
 from .PrescriptionViews import *
 from .PrescriptionPDFView import *

@@ -3,6 +3,7 @@ from .AuthUrls import urlpatterns as AuthUrls
 from .PasswordResetUrls import urlpatterns as PasswordResetUrls
 from .FacilityUrls import urlpatterns as FacilityUrls
 from .AppointmentUrls import urlpatterns as AppointmentUrls
+from .ChatUrls import urlpatterns as ChatUrls
 from .ConsultationUrls import urlpatterns as ConsultationUrls
 from .VideoConsultationUrls import urlpatterns as VideoConsultationUrls
 from .PrescriptionUrls import urlpatterns as PrescriptionUrls
@@ -16,6 +17,7 @@ urlpatterns = (
     + PasswordResetUrls 
     + FacilityUrls 
     + AppointmentUrls 
+    + ChatUrls
     + ConsultationUrls + VideoConsultationUrls
     + PrescriptionUrls
     + SymptomUrls + ProviderSearchUrls + AdminUserUrls
