@@ -9,7 +9,6 @@ services:
       context: ./digitalcare
     command: >
       sh -c "
-      sleep 10 &&
       python manage.py collectstatic --noinput --clear &&
       python manage.py migrate &&
       gunicorn digitalcare.wsgi:application --bind 0.0.0.0:8000 --workers 3"
@@ -39,10 +38,7 @@ services:
     container_name: digitalcare_celery_prod
     build:
       context: ./digitalcare
-    command: >
-      sh -c "
-      sleep 15 &&
-      celery -A digitalcare worker --loglevel=INFO"
+    command: celery -A digitalcare worker --loglevel=INFO
     volumes:
       - ./digitalcare:/usr/src/app/
       - ./media:/usr/src/app/media

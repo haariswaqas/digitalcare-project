@@ -135,26 +135,9 @@ class ChatRoomViewSet(viewsets.ModelViewSet):
         
         return Response({'message': 'Chat closed successfully.'})
     
-    @action(detail=True, methods=['get'])
-    def messages(self, request, pk=None):
-        """Get messages for a specific chat room with pagination"""
-        chat_room = self.get_object()
-        
-        # Mark messages as read for the current user
-        unread_messages = chat_room.messages.filter(is_read=False).exclude(sender=request.user)
-        for message in unread_messages:
-            message.mark_as_read(request.user)
-        
-        messages = chat_room.messages.all().order_by('created_at')
-        page = self.paginate_queryset(messages)
-        
-        if page is not None:
-            serializer = MessageSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = MessageSerializer(messages, many=True)
-        return Response(serializer.data)
+    
 
+# Add this to your MessageViewSet in chat_views.py
 
 class MessageViewSet(viewsets.ModelViewSet):
     """
@@ -170,13 +153,47 @@ class MessageViewSet(viewsets.ModelViewSet):
             # Ensure user is participant in the chat
             if self.request.user not in [chat_room.patient, chat_room.doctor]:
                 return Message.objects.none()
-            return chat_room.messages.all()
+            return chat_room.messages.all().order_by('created_at')
         return Message.objects.none()
     
     def get_serializer_class(self):
         if self.action == 'create':
             return CreateMessageSerializer
         return MessageSerializer
+    
+    def list(self, request, *args, **kwargs):
+        """List messages and auto-mark unread messages as read"""
+        chat_room_id = self.kwargs.get('chat_room_pk')
+        
+        if chat_room_id:
+            chat_room = get_object_or_404(ChatRoom, id=chat_room_id)
+            
+            # Verify user is participant in the chat
+            if request.user not in [chat_room.patient, chat_room.doctor]:
+                return Response(
+                    {'error': 'You are not authorized to view messages in this chat.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Auto-mark unread messages as read (excluding user's own messages)
+            unread_messages = chat_room.messages.filter(
+                is_read=False
+            ).exclude(sender=request.user)
+            
+            # Mark each unread message as read
+            for message in unread_messages:
+                message.mark_as_read(request.user)
+        
+        # Continue with normal list behavior
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
     
     def create(self, request, *args, **kwargs):
         """Send a new message"""
@@ -230,7 +247,6 @@ class MessageViewSet(viewsets.ModelViewSet):
             )
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class AvailableDoctorsView(viewsets.ReadOnlyModelViewSet):
     """
