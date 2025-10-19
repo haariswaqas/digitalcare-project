@@ -2,9 +2,11 @@ from .ProfileSerializers import *
 from .AuthSerializers import *
 from .PasswordResetSerializers import *
 from .HealthCardSerializers import *
+from .health_card_serializers import *
 
 from .FacilitySerializers import *
 from .AppointmentSerializers import *
+from .AppointmentReminderSerializers import *
 
 from .ChatSerializers import *
 from .ConsultationSerializers import *
@@ -13,3 +15,4 @@ from .SymptomSerializers import *
 
 from .AdminUserSerializer import *
 from .AdminFacilitySerializer import *
+from .ShiftSerializers import *

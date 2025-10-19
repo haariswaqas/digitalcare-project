@@ -9,3 +9,4 @@ class ApiConfig(AppConfig):
         import api.signals
         import api.notifications
         import api.tasks
+        import api.tasks_scheduled

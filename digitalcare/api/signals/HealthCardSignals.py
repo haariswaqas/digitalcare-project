@@ -11,7 +11,8 @@ def create_health_card(sender, instance, created, **kwargs):
     if created and instance.role in CARD_ELIGIBLE_ROLES:
         HealthCard.objects.create(
             user=instance,
-            card_type=HealthCard.CardType.SMART  # Default to SMART card
+            card_type=HealthCard.CardType.SMART,  # Default to SMART card
+            scan_count=0
         )
 
 @receiver(post_save, sender=User)

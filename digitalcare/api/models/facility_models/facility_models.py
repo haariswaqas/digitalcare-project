@@ -4,7 +4,9 @@ from ..authentication_models import User
 class Facility(models.Model):
     CLINIC = 'clinic'
     PHARMACY = 'pharmacy'
-    TYPE_CHOICES = [(CLINIC, 'Clinic'), (PHARMACY, 'Pharmacy')]
+    LABORATORY = 'laboratory'
+    
+    TYPE_CHOICES = [(CLINIC, 'Clinic'), (PHARMACY, 'Pharmacy'), (LABORATORY, 'Laboratory') ]
 
     STATUS_CHOICES = [
         ('Pending', 'Pending'),

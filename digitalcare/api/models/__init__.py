@@ -6,3 +6,4 @@ from .facility_models import *
 from .appointment_models import *
 from .prescription_models import *
 from .chat_models import *
+from .shift_models import *

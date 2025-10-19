@@ -4,6 +4,9 @@ from django.core.exceptions import ImproperlyConfigured
 import dj_database_url
 from datetime import timedelta
 
+import cloudinary
+from cloudinary_storage.storage import MediaCloudinaryStorage
+
 import sys
 
 LOGGING = {
@@ -42,6 +45,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 if not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS environment variable not set!")
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,22 +55,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
+    'cloudinary_storage',
+    'cloudinary',
     
-    'api',
-  
-    'rest_framework', 
-
+    
+    # Third party apps
+    'corsheaders',
+    'rest_framework',
     'channels',
     'channels_redis',
-    
     'rest_framework_simplejwt.token_blacklist',
     
+    # Cloudinary apps (add these)
+ 
     
-    
-    
+    # Your apps
+    'api',
+    'django_celery_beat',
 ]
-
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -101,6 +107,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'digitalcare.wsgi.application'
 # ASGI Configuration
 ASGI_APPLICATION = 'digitalcare.routing.application' 
+
 
 # Channel Layers configuration with Redis Cloud
 CHANNEL_LAYERS = {
@@ -192,9 +199,27 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ] if os.path.exists(os.path.join(BASE_DIR, 'static')) else []
 
+
+
+# Remove the hardcoded config and use environment variables
+CLOUDINARY_STORAGE = {
+    'CLOUDINARY_CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'CLOUDINARY_API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'CLOUDINARY_API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
+}
+
+# Configure cloudinary with environment variables
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+)
+
+# Set Cloudinary as default storage
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 # Additional static files configuration
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -329,4 +354,5 @@ DEFAULT_FROM_EMAIL = 'digitalcare@gmail.com'
 USE_TZ = True
 TIME_ZONE = "UTC"  # or your desired timezone
 CELERY_TIMEZONE = "UTC"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 CELERY_ENABLE_UTC = True

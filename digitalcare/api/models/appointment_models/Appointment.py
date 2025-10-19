@@ -28,8 +28,27 @@ class Appointment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
+    class Meta:  # Fixed indentation
         ordering = ['-scheduled_at']
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        from api.utils.shift_validator import ShiftValidator
+        
+        if self.doctor and self.facility and self.scheduled_at:
+            is_valid, message = ShiftValidator.is_appointment_within_shift(
+                self.scheduled_at,
+                self.duration_minutes,
+                self.doctor,
+                self.facility
+            )
+            
+            if not is_valid:
+                raise ValidationError(message)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Appt {self.id} for {self.patient} at {self.scheduled_at}"
