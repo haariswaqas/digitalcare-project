@@ -21,6 +21,7 @@ services:
     expose:
       - "8000"
     environment:
+      DJANGO_SETTINGS_MODULE: digitalcare.settings
       DEBUG: ${DEBUG:-0}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
@@ -51,6 +52,7 @@ services:
     volumes:
       - ./digitalcare:/usr/src/app/
     environment:
+      DJANGO_SETTINGS_MODULE: digitalcare.settings
       DEBUG: ${DEBUG:-0}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
@@ -83,6 +85,7 @@ services:
     volumes:
       - ./digitalcare:/usr/src/app/
     environment:
+      DJANGO_SETTINGS_MODULE: digitalcare.settings
       DEBUG: ${DEBUG:-0}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
