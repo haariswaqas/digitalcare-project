@@ -133,22 +133,29 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Try DATABASE_URL first (Render's preferred method)
-if os.environ.get('DATABASE_URL'):
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    # Use DATABASE_URL (Render or external DB)
     DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=os.getenv("DB_SSL_REQUIRE", "False").lower() == "true"
+        )
     }
 else:
+    # Fallback to local Docker/Postgres configuration
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('NAME'),
-        'USER': os.environ.get('USER'),
-        'PASSWORD': os.environ.get('PASSWORD'),
-        'HOST': os.environ.get('HOST'),
-        'POSTGRES_PORT': os.environ.get('POSTGRES_PORT'),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB", "digitalcare"),
+            "USER": os.getenv("POSTGRES_USER", "digitalcare_user"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD", "digitalcare_password"),
+            "HOST": os.getenv("POSTGRES_HOST", "postgres"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        }
     }
-}
 
 
 # Password validation

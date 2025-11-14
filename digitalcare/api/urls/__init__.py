@@ -9,6 +9,8 @@ from .SchedulerUrls import urlpatterns as SchedulerUrls
 from .ChatUrls import urlpatterns as ChatUrls
 from .ConsultationUrls import urlpatterns as ConsultationUrls
 from .VideoConsultationUrls import urlpatterns as VideoConsultationUrls
+from .DrugUrls import urlpatterns as DrugUrls
+
 from .PrescriptionUrls import urlpatterns as PrescriptionUrls
 from .SymptomUrls import urlpatterns as SymptomUrls 
 from .ProviderSearchUrls import urlpatterns as ProviderSearchUrls
@@ -23,6 +25,7 @@ urlpatterns = (
     + AppointmentUrls 
     + ChatUrls
     + ConsultationUrls + VideoConsultationUrls
+    + DrugUrls
     + PrescriptionUrls
     + SymptomUrls + ProviderSearchUrls + AdminUserUrls +ShiftUrls + HealthCardUrls + SchedulerUrls
 )

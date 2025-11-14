@@ -4,6 +4,8 @@ from .notification_models import *
 from .healthcard_models import *
 from .facility_models import *
 from .appointment_models import *
+from .drug_models import *
 from .prescription_models import *
 from .chat_models import *
 from .shift_models import *
+from .logging_models import *

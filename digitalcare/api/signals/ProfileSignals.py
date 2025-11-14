@@ -1,6 +1,9 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from ..models import User, VisitorProfile, StudentProfile, AdultProfile, DoctorProfile, Facility
+from ..models import (
+    User, VisitorProfile, StudentProfile, AdultProfile, DoctorProfile,
+    PharmacistProfile, LabTechProfile, Facility
+)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -13,9 +16,12 @@ def create_user_profile(sender, instance, created, **kwargs):
             AdultProfile.objects.create(user=instance)
         elif instance.role == User.DOCTOR:
             DoctorProfile.objects.create(user=instance)
+        elif instance.role == User.PHARMACIST:
+            PharmacistProfile.objects.create(user=instance)
+        elif instance.role == User.LAB_TECH:
+            LabTechProfile.objects.create(user=instance)
         elif instance.role == User.FACILITY_ADMIN:
-            # Create a Facility and link it to this user
-            Facility.objects.create(admin=instance, status='Pending')  # You can set other default fields as needed
+            Facility.objects.create(admin=instance, status='Pending')  # Default fields
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
@@ -27,5 +33,9 @@ def save_user_profile(sender, instance, **kwargs):
         instance.adultprofile.save()
     elif instance.role == User.DOCTOR and hasattr(instance, 'doctorprofile'):
         instance.doctorprofile.save()
+    elif instance.role == User.PHARMACIST and hasattr(instance, 'pharmacistprofile'):
+        instance.pharmacistprofile.save()
+    elif instance.role == User.LAB_TECH and hasattr(instance, 'labtechprofile'):
+        instance.labtechprofile.save()
     elif instance.role == User.FACILITY_ADMIN and hasattr(instance, 'facility'):
         instance.facility.save()

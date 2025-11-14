@@ -15,7 +15,12 @@ class DoctorProfile(models.Model):
     latitude = models.FloatField(null=True, blank=True)   # ✅ new
     longitude = models.FloatField(null=True, blank=True)  # ✅ new
     
-    clinics = models.ManyToManyField(Facility, related_name='doctors', blank=True)
+    clinics = models.ManyToManyField(
+        Facility, 
+        related_name='doctors', 
+        blank=True,
+        limit_choices_to={'facility_type': 'clinic'}
+    )
     is_active = models.BooleanField(default=True)
     license_number = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

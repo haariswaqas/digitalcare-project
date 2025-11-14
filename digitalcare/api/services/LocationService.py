@@ -3,7 +3,7 @@ import math
 from typing import Optional
 from django.db.models import Q, F, Value, FloatField
 from django.db.models.functions import ACos, Cos, Radians, Sin
-from ..models import DoctorProfile, Facility
+from ..models import DoctorProfile, Facility, PharmacistProfile, LabTechProfile
 
 
 class LocationService:
@@ -25,6 +25,7 @@ class LocationService:
             )
         )
 
+    # ---------------- FACILITIES ----------------
     @classmethod
     def get_nearby_facilities(
         cls,
@@ -53,6 +54,7 @@ class LocationService:
 
         return facilities
 
+    # ---------------- DOCTORS ----------------
     @classmethod
     def get_nearby_doctors(
         cls,
@@ -61,6 +63,9 @@ class LocationService:
         radius_km: float = 10,
         specialty: Optional[str] = None
     ):
+        """
+        Return nearby active doctors, optionally filtered by specialty.
+        """
         doctors = DoctorProfile.objects.filter(
             is_active=True,
             latitude__isnull=False,
@@ -73,11 +78,63 @@ class LocationService:
         doctors = doctors.annotate(
             distance_km=cls.haversine_distance_expression(
                 patient_lat, patient_lon,
-                "latitude",   # ✅ directly from doctor profile
+                "latitude",
                 "longitude"
             )
         ).filter(distance_km__lte=radius_km).order_by("distance_km")
 
         return doctors
 
+    # ---------------- PHARMACISTS ----------------
+    @classmethod
+    def get_nearby_pharmacists(
+        cls,
+        patient_lat: float,
+        patient_lon: float,
+        radius_km: float = 10
+    ):
+        """
+        Return nearby active pharmacists (no specialty filter).
+        """
+        pharmacists = PharmacistProfile.objects.filter(
+            is_active=True,
+            latitude__isnull=False,
+            longitude__isnull=False,
+        )
 
+        pharmacists = pharmacists.annotate(
+            distance_km=cls.haversine_distance_expression(
+                patient_lat, patient_lon,
+                "latitude",
+                "longitude"
+            )
+        ).filter(distance_km__lte=radius_km).order_by("distance_km")
+
+        return pharmacists
+
+    # ---------------- LAB TECHNICIANS ----------------
+    @classmethod
+    def get_nearby_lab_techs(
+        cls,
+        patient_lat: float,
+        patient_lon: float,
+        radius_km: float = 10
+    ):
+        """
+        Return nearby active laboratory technicians (no specialty filter).
+        """
+        lab_techs = LabTechProfile.objects.filter(
+            is_active=True,
+            latitude__isnull=False,
+            longitude__isnull=False,
+        )
+
+        lab_techs = lab_techs.annotate(
+            distance_km=cls.haversine_distance_expression(
+                patient_lat, patient_lon,
+                "latitude",
+                "longitude"
+            )
+        ).filter(distance_km__lte=radius_km).order_by("distance_km")
+
+        return lab_techs

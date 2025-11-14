@@ -353,7 +353,8 @@ class HealthCard(models.Model):
         # Get Prescriptions
         try:
             # Get all prescriptions through consultations through appointments
-            from ..medical_records_models import Prescription  # Adjust import based on your structure
+           
+            from ..prescription_models import Prescription
             
             prescription_list = []
             total_prescriptions = 0

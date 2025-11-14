@@ -10,6 +10,7 @@ from .AppointmentReminderSerializers import *
 
 from .ChatSerializers import *
 from .ConsultationSerializers import *
+from .DrugSerializers import *
 from .PrescriptionSerializers import *
 from .SymptomSerializers import *
 

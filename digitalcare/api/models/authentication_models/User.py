@@ -16,16 +16,21 @@ class User(AbstractUser):
     ADULT = 'adult'
     VISITOR = 'visitor'
     DOCTOR = 'doctor'
+    LAB_TECH = 'lab_tech'
+    PHARMACIST = 'pharmacist'
     
     
     ROLE_CHOICES = [
         (ADMIN, 'Admin'),
-        
         (FACILITY_ADMIN, 'Facility Admin'),
+        
         (STUDENT, 'Student'),
         (ADULT, 'Adult'),
         (VISITOR, 'Visitor'), 
-        (DOCTOR, 'Doctor')
+        (DOCTOR, 'Doctor'),
+        
+        (LAB_TECH, 'Lab_Tech'),
+        (PHARMACIST, 'Pharmacist')
         
         
     ]
