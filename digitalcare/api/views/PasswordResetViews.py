@@ -32,7 +32,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
             "If you did not request this, please ignore this email.\n\n"
             "Best regards,\nHospital Admin"
         )
-        send_email_task.delay(subject, message, [user.email])
+        send_email_task(subject, message, [user.email])
         return Response({"detail": "Password reset email sent."}, status=status.HTTP_200_OK)
         
 
@@ -52,5 +52,5 @@ class PasswordResetConfirmView(generics.GenericAPIView):
             "Your password has been reset successfully. If you did not initiate this change, please contact support immediately.\n\n"
             "Best regards,\nHospital Admin"
         )
-        send_email_task.delay(subject, message, [user.email])
+        send_email_task(subject, message, [user.email])
         return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)

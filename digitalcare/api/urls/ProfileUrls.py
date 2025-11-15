@@ -14,5 +14,5 @@ urlpatterns = [
     path("adult/profile/", AdultProfileView.as_view(), name="adult-profile"),
     path("doctor/profile/", DoctorProfileView.as_view(), name="doctor-profile"),
     path("pharmacist/profile/", PharmacistProfileView.as_view(), name="pharmacist-profile"),
-    path("lab-tech/profile/", LabTechProfileView.as_view(), name="lab-tech-profile"),
+    path("lab_tech/profile/", LabTechProfileView.as_view(), name="lab-tech-profile"),
 ]
