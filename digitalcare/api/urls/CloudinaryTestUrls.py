@@ -1,4 +1,5 @@
-from .views import cloudinary_diagnostic
+from ..views import cloudinary_diagnostic
+
 from django.urls import path
 urlpatterns = [
    
