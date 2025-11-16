@@ -20,3 +20,4 @@ from .AdminUserViews import *
 from .ShiftViews import *
 
 from .CloudinaryTestView import *
+from .TestFileUploadView import *
