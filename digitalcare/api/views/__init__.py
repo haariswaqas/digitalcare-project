@@ -18,3 +18,5 @@ from .VideoConsultationViews import *
 
 from .AdminUserViews import *
 from .ShiftViews import *
+
+from .CloudinaryTestView import *

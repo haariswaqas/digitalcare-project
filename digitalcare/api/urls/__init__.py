@@ -17,6 +17,9 @@ from .ProviderSearchUrls import urlpatterns as ProviderSearchUrls
 from .AdminUserUrls import urlpatterns as AdminUserUrls
 from .ShiftUrls import urlpatterns as ShiftUrls
 
+
+from .CloudinaryTestUrls import urlpatterns as CloudinaryTestUrls
+
 urlpatterns = (
     ProfileUrls 
     + AuthUrls 
@@ -27,5 +30,5 @@ urlpatterns = (
     + ConsultationUrls + VideoConsultationUrls
     + DrugUrls
     + PrescriptionUrls
-    + SymptomUrls + ProviderSearchUrls + AdminUserUrls +ShiftUrls + HealthCardUrls + SchedulerUrls
+    + SymptomUrls + ProviderSearchUrls + AdminUserUrls +ShiftUrls + HealthCardUrls + SchedulerUrls + CloudinaryTestUrls
 )
