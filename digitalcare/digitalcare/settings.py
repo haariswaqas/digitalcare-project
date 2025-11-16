@@ -5,7 +5,8 @@ import dj_database_url
 from datetime import timedelta
 
 import cloudinary
-from cloudinary_storage.storage import MediaCloudinaryStorage
+import cloudinary.uploader
+import cloudinary.api
 
 import sys
 
@@ -32,9 +33,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
     raise ImproperlyConfigured("SECRET_KEY environment variable not set!")
@@ -55,9 +53,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Cloudinary apps - ORDER MATTERS!
     'cloudinary_storage',
     'cloudinary',
-    
     
     # Third party apps
     'corsheaders',
@@ -66,25 +65,21 @@ INSTALLED_APPS = [
     'channels_redis',
     'rest_framework_simplejwt.token_blacklist',
     
-    # Cloudinary apps (add these)
- 
-    
     # Your apps
     'api',
     'django_celery_beat',
 ]
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-  
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-   
 ]
 
 ROOT_URLCONF = 'digitalcare.urls'
@@ -131,8 +126,6 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
@@ -159,8 +152,6 @@ else:
 
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -178,8 +169,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -189,11 +178,8 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 # ----------------------------
-# Static & Media files
+# Static & Media files with Cloudinary
 # ----------------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -201,38 +187,59 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Add this for better static file serving
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Ensure static files are collected properly
-
-
-# Remove the hardcoded config and use environment variables
-CLOUDINARY_STORAGE = {
-    'CLOUDINARY_CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'CLOUDINARY_API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'CLOUDINARY_API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
-}
-
-# Configure cloudinary with environment variables
-cloudinary.config(
-    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.environ.get('CLOUDINARY_API_KEY'),
-    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
-)
-
-# Set Cloudinary as default storage
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# Additional static files configuration
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+# ----------------------------
+# Cloudinary Configuration - FIXED
+# ----------------------------
 
+# Get Cloudinary credentials from environment
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
+
+# Validate Cloudinary credentials
+if not all([CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET]):
+    raise ImproperlyConfigured(
+        "Cloudinary credentials not properly configured. "
+        "Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET"
+    )
+
+# Configure cloudinary
+cloudinary.config(
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET,
+    secure=True  # Always use HTTPS
+)
+
+# Cloudinary storage settings
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+    'API_KEY': CLOUDINARY_API_KEY,
+    'API_SECRET': CLOUDINARY_API_SECRET,
+    'SECURE': True,  # Use HTTPS
+    'MEDIA_TAG': 'media',  # Optional: tag for media files
+    'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
+    'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),  # Don't delete files on model delete
+    'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'manifest'),
+}
+
+# Set Cloudinary as default storage for media files
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Media URL will be served from Cloudinary
+MEDIA_URL = '/media/'  # This is just a fallback, Cloudinary will handle the actual URLs
+
+# Local media root (only used as fallback in development)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'api.User'
@@ -246,11 +253,10 @@ REST_FRAMEWORK = {
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8100",
     "http://localhost:8100",
-    "http://127.0.0.1:8000",  # if you're using this too
+    "http://127.0.0.1:8000",
     "http://localhost:8000",
     "http://localhost:5173"
 ]
-
 
 
 SIMPLE_JWT = {
@@ -287,7 +293,7 @@ SIMPLE_JWT = {
 
 
 # ----------------------------
-# Celery Configuration - UPDATED FOR PRODUCTION
+# Celery Configuration
 # ----------------------------
 if DEBUG:
     # Development - use local Redis
@@ -310,8 +316,8 @@ TWILIO_API_KEY_SECRET = os.environ.get("TWILIO_API_KEY_SECRET")
 TWILIO_TOKEN_TTL = int(os.environ.get("TWILIO_TOKEN_TTL", 3600))
 
 
-DJANGO_CELERY_BEAT_TZ_AWARE = False  # If using naive dates
-CELERY_TIMEZONE = 'UTC'  # Or your local timezone
+DJANGO_CELERY_BEAT_TZ_AWARE = False
+CELERY_TIMEZONE = 'UTC'
 
 
 CORS_ALLOW_ALL_ORIGINS = False
@@ -341,9 +347,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-# Email configuration example:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# Use Django console backend to simulate email sending
+# Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
@@ -357,7 +361,7 @@ RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@digitalcare.com")
 
 USE_TZ = True
-TIME_ZONE = "UTC"  # or your desired timezone
+TIME_ZONE = "UTC"
 CELERY_TIMEZONE = "UTC"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 CELERY_ENABLE_UTC = True
